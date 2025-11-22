@@ -35,6 +35,7 @@ class BarkMsg(_PluginBase):
     _apikey = None
     _params = None
     _msgtypes = []
+    _user_keys = {}  # 用户ID到密钥的映射
 
     def init_plugin(self, config: dict = None):
         if config:
@@ -44,6 +45,14 @@ class BarkMsg(_PluginBase):
             self._server = config.get("server")
             self._apikey = config.get("apikey")
             self._params = config.get("params")
+
+            # 解析用户ID和密钥的映射关系
+            self._user_keys = {}
+            if self._apikey:
+                for line in self._apikey.split():
+                    if ':' in line:
+                        user_id, device_key = line.split(':', 1)
+                        self._user_keys[user_id.strip()] = device_key.strip()
 
         if self._onlyonce:
             self._onlyonce = False
@@ -160,8 +169,8 @@ class BarkMsg(_PluginBase):
                                         'component': 'VTextarea',
                                         'props': {
                                             'model': 'apikey',
-                                            'label': '密钥',
-                                            'placeholder': '每行一个用户密钥',
+                                            'label': '用户密钥',
+                                            'placeholder': '每行一个配置，格式：用户ID:密钥',
                                         }
                                     }
                                 ]
@@ -204,15 +213,17 @@ class BarkMsg(_PluginBase):
     def get_page(self) -> List[dict]:
         pass
 
-    def _send(self, title: str, text: str) -> Optional[Tuple[bool, str]]:
+    def _send(self, title: str, text: str, userid: str = None) -> Optional[Tuple[bool, str]]:
         """
         发送消息
         :param title: 标题
         :param text: 内容
+        :param userid: 用户ID
         """
         try:
-            if not self._server or not self._apikey:
+            if not self._server or not self._user_keys:
                 return False, "参数未配置"
+
             req_body = {k: v[0] for k, v in parse_qs(self._params).items()}
             req_body.update(
                 {
@@ -220,27 +231,46 @@ class BarkMsg(_PluginBase):
                     "body": text,
                 }
             )
-            for apikey in self._apikey.split():
-                req_body.update(
-                    {
-                        "device_key": apikey,
-                    }
-                )
+
+            # 根据用户ID发送消息
+            if userid and userid in self._user_keys:
+                # 发送给指定用户
+                device_key = self._user_keys[userid]
+                req_body.update({"device_key": device_key})
                 res = RequestUtils().post_res(f"{self._server}/push", data=req_body)
                 if res and res.status_code == 200:
                     ret_json = res.json()
                     code = ret_json["code"]
                     message = ret_json["message"]
                     if code == 200:
-                        logger.info(f"{apikey} Bark消息发送成功")
+                        logger.info(f"用户 {userid} Bark消息发送成功")
                     else:
-                        logger.warn(f"{apikey} Bark消息发送失败：{message}")
+                        logger.warn(f"用户 {userid} Bark消息发送失败：{message}")
                 elif res is not None:
                     logger.warn(
-                        f"{apikey} Bark消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}"
+                        f"用户 {userid} Bark消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}"
                     )
                 else:
-                    logger.warn(f"{apikey} Bark消息发送失败：未获取到返回信息")
+                    logger.warn(f"用户 {userid} Bark消息发送失败：未获取到返回信息")
+            else:
+                # 发送给所有用户
+                for user_id, device_key in self._user_keys.items():
+                    req_body.update({"device_key": device_key})
+                    res = RequestUtils().post_res(f"{self._server}/push", data=req_body)
+                    if res and res.status_code == 200:
+                        ret_json = res.json()
+                        code = ret_json["code"]
+                        message = ret_json["message"]
+                        if code == 200:
+                            logger.info(f"用户 {user_id} Bark消息发送成功")
+                        else:
+                            logger.warn(f"用户 {user_id} Bark消息发送失败：{message}")
+                    elif res is not None:
+                        logger.warn(
+                            f"用户 {user_id} Bark消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}"
+                        )
+                    else:
+                        logger.warn(f"用户 {user_id} Bark消息发送失败：未获取到返回信息")
         except Exception as msg_e:
             logger.error(f"Bark消息发送失败：{str(msg_e)}")
 
@@ -266,6 +296,8 @@ class BarkMsg(_PluginBase):
         title = msg_body.get("title")
         # 文本
         text = msg_body.get("text")
+        # 用户ID
+        userid = msg_body.get("userid")
 
         if not title and not text:
             logger.warn("标题和内容不能同时为空")
@@ -276,7 +308,7 @@ class BarkMsg(_PluginBase):
             logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
             return
 
-        return self._send(title, text)
+        return self._send(title, text, userid)
 
     def stop_service(self):
         """
