@@ -20,7 +20,7 @@ class BarkMultiUserMsg(_PluginBase):
     # 插件作者
     plugin_author = "weimh"
     # 作者主页
-    author_url = "https://github.com/weiminghao000"
+    author_url = "https://github.com/weiminghaoo"
     # 插件配置项ID前缀
     plugin_config_prefix = "barkmultiusermsg_"
     # 加载顺序
