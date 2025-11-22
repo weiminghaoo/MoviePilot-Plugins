@@ -1,8 +1,8 @@
 {
 
-  "BarkMsg": {
-    "name": "Bark消息推送_支持多用户",
-    "description": "支持使用Bark发送消息通知。",
+  "BarkMultiUserMsg": {
+    "name": "Bark多用户消息推送",
+    "description": "支持使用Bark为多个用户发送消息通知，可根据用户ID精准推送。",
     "labels": "消息通知",
     "version": "1.0",
     "icon": "Bark_A.png",

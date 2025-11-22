@@ -8,21 +8,21 @@ from app.schemas.types import EventType, NotificationType
 from app.utils.http import RequestUtils
 
 
-class BarkMsg(_PluginBase):
+class BarkMultiUserMsg(_PluginBase):
     # 插件名称
-    plugin_name = "Bark消息通知"
+    plugin_name = "Bark多用户消息通知"
     # 插件描述
-    plugin_desc = "支持使用Bark发送消息通知。"
+    plugin_desc = "支持使用Bark为多个用户发送消息通知，可根据用户ID精准推送。"
     # 插件图标
     plugin_icon = "Bark_A.png"
     # 插件版本
     plugin_version = "1.4"
     # 插件作者
-    plugin_author = "jxxghp"
+    plugin_author = "weimh"
     # 作者主页
-    author_url = "https://github.com/jxxghp"
+    author_url = "https://github.com/weiminghao000"
     # 插件配置项ID前缀
-    plugin_config_prefix = "barkmsg_"
+    plugin_config_prefix = "barkmultiusermsg_"
     # 加载顺序
     plugin_order = 27
     # 可使用的用户级别
