@@ -16,7 +16,7 @@ class BarkMultiUserMsg(_PluginBase):
     # 插件图标
     plugin_icon = "Bark_A.png"
     # 插件版本
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     # 插件作者
     plugin_author = "weimh"
     # 作者主页
@@ -236,10 +236,10 @@ class BarkMultiUserMsg(_PluginBase):
             logger.info(f"=== Bark消息发送 ===")
             logger.info(f"标题: {title}")
             logger.info(f"内容: {text}")
-            logger.info(f"用户ID: {userid if userid else '全部用户'}")
+            logger.info(f"用户ID: {userid}")
             logger.info(f"服务器: {self._server}")
             logger.info("===================")
-
+            
             # 根据用户ID发送消息
             if userid and userid in self._user_keys:
                 # 发送给指定用户
