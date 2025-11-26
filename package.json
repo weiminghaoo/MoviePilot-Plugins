@@ -4,13 +4,14 @@
     "name": "Bark多用户消息推送",
     "description": "支持使用Bark为多个用户发送消息通知，可根据用户ID精准推送。",
     "labels": "消息通知",
-    "version": "1.0",
+    "version": "1.1",
     "icon": "Bark_A.png",
     "author": "weimh",
     "level": 1,
     "v2": true,
     "history": {
-      "v1.0": "支持多人消息发送"
+      "v1.0": "支持多人消息发送",
+      "v1.1": "添加打印消息信息"
     }
   }
   
