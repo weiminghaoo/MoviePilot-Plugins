@@ -15,6 +15,20 @@
       "v1.2": "修复用户ID为空时的异常",
       "v1.3": "修复用户ID为空时的异常"
     }
+  },
+  "WxPusherMultUserMsg": {
+    "name": "WxPusher多用户消息推送",
+    "description": "支持微信(暂时停止)、APP(无后台)、浏览器插件通知。",
+    "labels": "消息通知",
+    "version": "1.0",
+    "icon": "WxPusherMsg_A.png",
+    "author": "weimh",
+    "level": 1,
+    "v2": true,
+    "history": {
+      "v1.0": "支持多人消息发送"
+    }
   }
+  
   
 }
