@@ -15,7 +15,7 @@ class WxPusherMultUserMsg(_PluginBase):
     plugin_desc: str = "支持微信(暂时停止)、APP(无后台)、浏览器插件通知。"
     plugin_icon: str = "WxPusherMsg_A.png"
     plugin_version: str = "1.0"
-    plugin_author: str = "zhjay"
+    plugin_author: str = "weimh"
     author_url: str = "https://github.com/weiminghaoo"
     plugin_config_prefix: str = "wxpushermultmsg_"
     plugin_order: int = 30
