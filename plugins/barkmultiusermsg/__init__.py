@@ -10,13 +10,13 @@ from app.utils.http import RequestUtils
 
 class BarkMultiUserMsg(_PluginBase):
     # 插件名称
-    plugin_name = "Bark多用户消息通知1"
+    plugin_name = "Bark多用户消息通知"
     # 插件描述
     plugin_desc = "支持使用Bark为多个用户发送消息通知，可根据用户ID精准推送。"
     # 插件图标
     plugin_icon = "Bark_A.png"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "weimh"
     # 作者主页
