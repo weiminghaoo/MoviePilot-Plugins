@@ -10,7 +10,7 @@ from app.utils.http import RequestUtils
 
 class BarkMultiUserMsg(_PluginBase):
     # 插件名称
-    plugin_name = "Bark多用户消息通知"
+    plugin_name = "Bark多用户消息通知1"
     # 插件描述
     plugin_desc = "支持使用Bark为多个用户发送消息通知，可根据用户ID精准推送。"
     # 插件图标
@@ -56,7 +56,10 @@ class BarkMultiUserMsg(_PluginBase):
 
         if self._onlyonce:
             self._onlyonce = False
+            # 发送测试消息
             self._send("Bark消息测试通知", "Bark消息通知插件已启用")
+            config['onlyonce'] = False
+            self.update_config(config)
 
     def get_state(self) -> bool:
         return self._enabled and (True if self._server and self._apikey else False)
@@ -170,7 +173,7 @@ class BarkMultiUserMsg(_PluginBase):
                                         'props': {
                                             'model': 'apikey',
                                             'label': '用户密钥',
-                                            'placeholder': '每行一个配置，格式：用户ID:密钥',
+                                            'placeholder': '每行一个配置，格式：用户名:密钥',
                                         }
                                     }
                                 ]
@@ -213,12 +216,12 @@ class BarkMultiUserMsg(_PluginBase):
     def get_page(self) -> List[dict]:
         pass
 
-    def _send(self, title: str, text: str, userid: str = None) -> Optional[Tuple[bool, str]]:
+    def _send(self, title: str, text: str, username: str = None) -> Optional[Tuple[bool, str]]:
         """
         发送消息
         :param title: 标题
         :param text: 内容
-        :param userid: 用户ID
+        :param username: 用户ID
         """
         try:
             if not self._server or not self._user_keys:
@@ -236,14 +239,14 @@ class BarkMultiUserMsg(_PluginBase):
             logger.info(f"=== Bark消息发送 ===")
             logger.info(f"标题: {title}")
             logger.info(f"内容: {text}")
-            logger.info(f"用户ID: {userid}")
+            logger.info(f"用户ID: {username}")
             logger.info(f"服务器: {self._server}")
             logger.info("===================")
             
             # 根据用户ID发送消息
-            if userid and userid in self._user_keys:
+            if username and username in self._user_keys:
                 # 发送给指定用户
-                device_key = self._user_keys[userid]
+                device_key = self._user_keys[username]
                 req_body.update({"device_key": device_key})
                 res = RequestUtils().post_res(f"{self._server}/push", data=req_body)
                 if res and res.status_code == 200:
@@ -251,15 +254,15 @@ class BarkMultiUserMsg(_PluginBase):
                     code = ret_json["code"]
                     message = ret_json["message"]
                     if code == 200:
-                        logger.info(f"用户 {userid} Bark消息发送成功")
+                        logger.info(f"用户 {username} Bark消息发送成功")
                     else:
-                        logger.warn(f"用户 {userid} Bark消息发送失败：{message}")
+                        logger.warn(f"用户 {username} Bark消息发送失败：{message}")
                 elif res is not None:
                     logger.warn(
-                        f"用户 {userid} Bark消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}"
+                        f"用户 {username} Bark消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}"
                     )
                 else:
-                    logger.warn(f"用户 {userid} Bark消息发送失败：未获取到返回信息")
+                    logger.warn(f"用户 {username} Bark消息发送失败：未获取到返回信息")
             else:
                 # 发送给所有用户
                 for user_id, device_key in self._user_keys.items():
@@ -305,7 +308,7 @@ class BarkMultiUserMsg(_PluginBase):
         # 文本
         text = msg_body.get("text")
         # 用户ID
-        userid = msg_body.get("userid")
+        username = msg_body.get("username")
 
         if not title and not text:
             logger.warn("标题和内容不能同时为空")
@@ -316,7 +319,7 @@ class BarkMultiUserMsg(_PluginBase):
             logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
             return
 
-        return self._send(title, text, userid)
+        return self._send(title, text, username)
 
     def stop_service(self):
         """
